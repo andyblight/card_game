@@ -37,6 +37,68 @@ class TestCard(unittest.TestCase):
             self.assertEqual(card_string, card1.__str__())
 
 
+class TestPile(unittest.TestCase):
+
+    def test_empty_pile(self):
+        pile_name = "Test pile"
+        pile = CardGame.Pile(pile_name)
+        self.assertEqual(pile.name, pile_name)
+        self.assertTrue(pile.is_empty())
+        self.assertEqual(pile.count(), 0)
+
+    def test_one_card(self):
+        pile_name = "Test pile"
+        pile = CardGame.Pile(pile_name)
+        """Add one card."""
+        pile.add(CardGame.Card(1, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 1)
+        """Take one card."""
+        card1 = pile.take()
+        self.assertTrue(pile.is_empty())
+        self.assertEqual(pile.count(), 0)
+        self.assertEqual(card1.suit, 1)
+        self.assertEqual(card1.rank, 9)
+        """Push one card."""
+        pile.push(CardGame.Card(2, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 1)
+        """Pop one card."""
+        card1 = pile.pop()
+        self.assertTrue(pile.is_empty())
+        self.assertEqual(pile.count(), 0)
+        self.assertEqual(card1.suit, 2)
+        self.assertEqual(card1.rank, 9)
+
+    def test_many_cards(self):
+        pile_name = "Test pile"
+        pile = CardGame.Pile(pile_name)
+        """Add one card."""
+        pile.add(CardGame.Card(1, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 1)
+        """Add one card."""
+        pile.add(CardGame.Card(2, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 2)
+        """Add one card."""
+        pile.add(CardGame.Card(3, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 3)
+        """Add one card."""
+        pile.add(CardGame.Card(4, 9))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 4)
+        """Delete one card from the middle of the pile."""
+        self.assertTrue(pile.remove(CardGame.Card(3, 9)))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 3)
+        """Try to delete one card not in the pile."""
+        self.assertFalse(pile.remove(CardGame.Card(3, 10)))
+        self.assertFalse(pile.is_empty())
+        self.assertEqual(pile.count(), 3)
+
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()
