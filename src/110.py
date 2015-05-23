@@ -42,10 +42,11 @@ class CardGame110():
 
     def ResetScores(self):
         """ ."""
-        print("Resetting scores")
+        print("Resetting scores and player's hands")
         self.highest_score = 0
         for i in range(len(self.players)):
             self.players[i].current_score = 0
+            self.players[i].clear()
 
     def DealHands(self):
         """Deals 5 cards to each player."""
@@ -55,8 +56,8 @@ class CardGame110():
     def Bid(self):
         """ ."""
         print("Bidding")
-        for player in range(len(self.players)):
-            player.list()
+        for i in range(len(self.players)):
+            self.players[i].hand.list()
 
     def ExchangeCards(self):
         """ ."""
@@ -70,7 +71,7 @@ class CardGame110():
         """ ."""
         print("Updating scores")
         # AJB Bodge
-        self.players[0].current_score = self.players[0].current_score + 10
+        self.players[0].current_score = self.players[0].current_score + 120
         self.highest_score = 0
         for i in range(len(self.players)):
             print(self.players[i].hand.name + " has " +

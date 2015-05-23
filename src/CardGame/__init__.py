@@ -41,7 +41,8 @@ class Card:
     """ The Card class implements the basic methods for using a card. """
 
     def __init__(self, suit=Suit.Undefined, rank=Rank.Undefined):
-        if (1 <= suit <= 6) and (1 <= rank <= 14):
+        if (Suit.Undefined < suit <= Suit.Black) \
+                and (Rank.Undefined <= rank <= Rank.Joker):
             self.suit = suit
             self.rank = rank
         else:
@@ -54,7 +55,9 @@ class Card:
         rank_string = self.rank.__str__()
         suit_split = suit_string.partition(".")
         rank_spilt = rank_string.partition(".")
-        return rank_spilt[2] + " of " + suit_split[2]
+        card_str = rank_spilt[2] + " " + suit_split[2]
+        # print("DBG Card " + card_str + ".")
+        return card_str
 
 
 class Pile:
@@ -107,8 +110,8 @@ class Hand(Pile):
     def list(self):
         """Prints a list of all cards in a hand."""
         cards_str = self.name + " has "
-        for card in range(self.cards.count()):
-            cards_str = cards_str + card
+        for i in range(len(self.cards)):
+            cards_str = cards_str + self.cards[i].__str__() + ", "
         print(cards_str)
 
 
@@ -118,15 +121,20 @@ class Player():
     def __init__(self, name):
         self.hand = Hand(name)
 
+    def clear(self):
+        self.hand.cards.clear()
+
 
 class Deck(Pile):
     """class."""
 
     def __init__(self, name="Deck"):
         Pile.__init__(self, name)
-        for suit in range(1, 5):
-            for rank in range(1, 14):
-                self.cards.append(Card(suit, rank))
+        for suit in Suit:
+            for rank in Rank:
+                if (Suit.Hearts < suit < Suit.Red) \
+                        and (Rank.Ace < rank < Rank.Joker):
+                    self.cards.append(Card(suit, rank))
 
     def shuffle(self):
         """Shuffles the cards in the deck by swapping them."""
@@ -139,8 +147,9 @@ class Deck(Pile):
 
     def deal(self, players, num_cards=999):
         """Deals num_cards to each hand in hands."""
-        for dummy in range(num_cards):
+        for i in range(0, num_cards):
             for j in range(len(players)):
+                # print("DEAL: card " + str(i) + ", player " + str(j))
                 if self.is_empty():
                     break
                 card = self.pop()
