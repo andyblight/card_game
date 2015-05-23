@@ -55,6 +55,8 @@ class CardGame110():
     def Bid(self):
         """ ."""
         print("Bidding")
+        for player in range(len(self.players)):
+            player.list()
 
     def ExchangeCards(self):
         """ ."""

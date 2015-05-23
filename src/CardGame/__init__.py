@@ -104,6 +104,13 @@ class Hand(Pile):
     def __init__(self, name):
         Pile.__init__(self, name)
 
+    def list(self):
+        """Prints a list of all cards in a hand."""
+        cards_str = self.name + " has "
+        for card in range(self.cards.count()):
+            cards_str = cards_str + card
+        print(cards_str)
+
 
 class Player():
     """ ."""
@@ -126,15 +133,14 @@ class Deck(Pile):
         import random
         num_cards = self.count()
         for dummy in range(1, 2):
-            for i in range(1, num_cards):
+            for i in range(num_cards):
                 j = random.randrange(i, num_cards)
                 self.cards[i], self.cards[j] = self.cards[j], self.cards[i]
 
     def deal(self, players, num_cards=999):
         """Deals num_cards to each hand in hands."""
-        num_hands = len(players)
         for dummy in range(num_cards):
-            for j in range(num_hands):
+            for j in range(len(players)):
                 if self.is_empty():
                     break
                 card = self.pop()
