@@ -41,7 +41,7 @@ class Card:
     """ The Card class implements the basic methods for using a card. """
 
     def __init__(self, suit=Suit.Undefined, rank=Rank.Undefined):
-        if ((1 <= suit <= 4) and (1 <= rank <= 13)):
+        if (1 <= suit <= 6) and (1 <= rank <= 14):
             self.suit = suit
             self.rank = rank
         else:
@@ -108,8 +108,8 @@ class Hand(Pile):
 class Player():
     """ ."""
 
-    def __init__(self):
-        self.hand = Hand()
+    def __init__(self, name):
+        self.hand = Hand(name)
 
 
 class Deck(Pile):
@@ -124,9 +124,9 @@ class Deck(Pile):
     def shuffle(self):
         """Shuffles the cards in the deck by swapping them."""
         import random
-        num_cards = self.count
+        num_cards = self.count()
         for dummy in range(1, 2):
-            for i in range(num_cards):
+            for i in range(1, num_cards):
                 j = random.randrange(i, num_cards)
                 self.cards[i], self.cards[j] = self.cards[j], self.cards[i]
 
