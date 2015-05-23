@@ -33,10 +33,19 @@ class CardGame110():
         # Create and shuffle the deck
         self.deck = Deck110()
         self.deck.shuffle()
+        # Create highest score
+        self.highest_score = 0
         # Create the players
         self.players = list()
         for i in range(0, 4):
             self.players.append(Player110("Player" + str(i)))
+
+    def ResetScores(self):
+        """ ."""
+        print("Resetting scores")
+        self.highest_score = 0
+        for i in range(len(self.players)):
+            self.players[i].current_score = 0
 
     def DealHands(self):
         """Deals 5 cards to each player."""
@@ -60,17 +69,12 @@ class CardGame110():
         print("Updating scores")
         # AJB Bodge
         self.players[0].current_score = self.players[0].current_score + 10
-        highest_score = 0
+        self.highest_score = 0
         for i in range(len(self.players)):
             print(self.players[i].hand.name + " has " +
                   str(self.players[i].current_score))
-            if highest_score < self.players[i].current_score:
-                highest_score = self.players[i].current_score
-        return highest_score
-
-    def ResetScores(self):
-        """ ."""
-        print("Dealing cards")
+            if self.highest_score < self.players[i].current_score:
+                self.highest_score = self.players[i].current_score
 
     def PlayAgain(self):
         """ ."""
@@ -84,17 +88,17 @@ class CardGame110():
         """ ."""
 
     def Play(self):
-        """ ."""
+        """Play a round."""
         play_again = True
         while play_again:
+            self.ResetScores()
             # Zero current scores
-            highest_current_score = 0
-            while highest_current_score < 110:
+            while self.highest_score < 110:
                 self.DealHands()
                 self.Bid()
                 self.ExchangeCards()
                 self.PlayHand()
-                highest_current_score = self.UpdateScores()
+                self.UpdateScores()
             play_again = self.PlayAgain()
             self.TerminateGame()
 
