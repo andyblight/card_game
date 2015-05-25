@@ -116,12 +116,13 @@ class Hand(Pile):
 
 
 class Player():
-    """ ."""
+    """The player class has a one hand."""
 
     def __init__(self, name):
         self.hand = Hand(name)
 
     def clear(self):
+        """Clears the hand of the player."""
         self.hand.cards.clear()
 
 
@@ -147,9 +148,8 @@ class Deck(Pile):
 
     def deal(self, players, num_cards=999):
         """Deals num_cards to each hand in hands."""
-        for i in range(0, num_cards):
+        for dummy in range(0, num_cards):
             for j in range(len(players)):
-                # print("DEAL: card " + str(i) + ", player " + str(j))
                 if self.is_empty():
                     break
                 card = self.pop()
