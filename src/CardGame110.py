@@ -122,72 +122,92 @@ class CardGame110():
         bidding_player = 0
         highest_bid = 10
         highest_bid_player = -1
-        for i in range(0, len(self.players)):
-            player = self.players.get_player(i)
+        for player_num in range(0, len(self.players)):
+            player = self.players.get_player(player_num)
             player.hand.list()
-            bid_string = input('Enter bid, 0, 15, 20, 25, 30')
-            if len(bid_string) > 0:
+            bid_string = input("Enter bid, 0, 15, 20, 25, 30 ")
+            try:
                 bid_value = int(bid_string)
-                if bid_value >= 15 and bid_value <= 30 and (bid_value % 5) == 0:
-                    # Bid in range
-                    if bid_value > highest_bid:
-                        highest_bid = bid_value
-                        highest_bid_player = i
-                        print(player.hand.name + " takes bid with "
-                              + str(bid_value))
-                    if bid_value == highest_bid and self.players.is_dealer(i):
-                        highest_bid_player = i
-                        print("Dealer takes bid with " + bid_value)
+            except ValueError:
+                bid_value = -1
+            if bid_value >= 15 and bid_value <= 30 and (bid_value % 5) == 0:
+                # Bid in range
+                if bid_value > highest_bid:
+                    highest_bid = bid_value
+                    highest_bid_player = player_num
+                    print(player.hand.name + " takes bid with "
+                          + str(bid_value))
+                if bid_value == highest_bid and \
+                        self.players.is_dealer(player_num):
+                    highest_bid_player = player_num
+                    print("Dealer takes bid with " + bid_value)
             # Else bid out of range so treat as no bid.
         if highest_bid == 10:
             print("No bid from anyone.  Deal again.")
             return False
         return True
 
+    def mark_cards_for_discard(self, player):
+        """Mark the cards in the players hand that will be discarded."""
+        cards_to_discard = [False, False, False, False, False]
+        discarding = True
+        while discarding:
+            # Display cards with those marked for discard
+            print("Player " + player.hand.name)
+            print("Index  Discard  Card")
+            for card_index in range(0, len(player.hand.cards)):
+                print("{:5}  {:7}  {}".
+                      format(str(card_index + 1),
+                             str(cards_to_discard[card_index]),
+                             str(player.hand.cards[card_index])))
+            bid_string = input(
+                "Enter card to discard, 1-5. Enter 0 when done.")
+            try:
+                bid_value = int(bid_string)
+            except ValueError:
+                bid_value = -1
+            if 0 < bid_value < 6:
+                cards_to_discard[bid_value - 1] = True
+            if bid_value == 0:
+                discarding = False
+        return cards_to_discard
+
     def exchange_cards(self):
-        """ ."""
+        """Each player in turn discards zero or more cards."""
         print("Exchange cards")
         for player_num in range(0, len(self.players)):
-            cards_to_discard = [False, False, False, False, False]
-            discarding = True
             player = self.players.get_player(player_num)
-            while discarding:
-                # Display cards with those marked for discard
-                print("Player " + player.hand.name)
-                print("Index  Discard  Card")
-                for card_index in range(0, len(player.hand.cards)):
-                    print("{:5}  {:7}  {}".
-                          format(str(card_index + 1),
-                                 str(cards_to_discard[card_index]),
-                                 str(player.hand.cards[card_index])))
-                bid_string = input(
-                    'Enter card to discard, 1-5. Enter 0 when done.')
-                try:
-                    bid_value = int(bid_string)
-                except ValueError:
-                    bid_value = -1
-                if 0 < bid_value < 6:
-                    cards_to_discard[bid_value - 1] = True
-                if bid_value == 0:
-                    discarding = False
-            # Finished discarding, so get rid of cards and replace them
-            # with new cards from the deck.
+            cards_to_discard = self.mark_cards_for_discard(player)
+            # Replace them with new cards from the deck.
+            for card_index in range(0, len(player.hand.cards)):
+                if cards_to_discard[card_index]:
+                    player.hand.cards[card_index] = self.deck.pop()
+            # Update the player's cards
+            self.players.set_player(player_num, player)
 
     def play_hand(self):
         """ ."""
         print("play hand")
+        for player_num in range(0, len(self.players)):
+            player = self.players.get_player(player_num)
+            # Debug
+            player.hand.list()
 
     def update_scores(self):
         """ ."""
         print("Updating scores")
         # AJB Bodge
-        self.players[0].current_score = self.players[0].current_score + 120
+        player = self.players.get_player(0)
+        player.current_score = 120
+        self.players.set_player(0, player)
+        # Update self.highest_score from players individual scores
         self.highest_score = 0
-        for i in range(len(self.players)):
-            print(self.players[i].hand.name + " has " +
-                  str(self.players[i].current_score))
-            if self.highest_score < self.players[i].current_score:
-                self.highest_score = self.players[i].current_score
+        for player_num in range(len(self.players)):
+            player = self.players.get_player(player_num)
+            print(player.hand.name + " has " +
+                  str(player.current_score))
+            if self.highest_score < player.current_score:
+                self.highest_score = player.current_score
 
 #    def terminate_game(self):
 #        """ ."""
