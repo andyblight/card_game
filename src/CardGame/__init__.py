@@ -51,8 +51,8 @@ class Card:
             raise ValueError("Parameter out of range")
 
     def __str__(self):
-        suit_string = self.suit.__str__()
-        rank_string = self.rank.__str__()
+        suit_string = str(self.suit)
+        rank_string = str(self.rank)
         suit_split = suit_string.partition(".")
         rank_spilt = rank_string.partition(".")
         card_str = rank_spilt[2] + " " + suit_split[2]
@@ -91,15 +91,6 @@ class Pile:
         """Returns and removes the card from the top of the pile."""
         return self.cards.pop(0)
 
-    def remove(self, card):
-        """Removes a card from the pile with the same value as the given
-        card."""
-        if card in self.cards:
-            self.cards.remove(card)
-            return True
-        else:
-            return False
-
 
 class Hand(Pile):
     """class."""
@@ -111,7 +102,7 @@ class Hand(Pile):
         """Prints a list of all cards in a hand."""
         cards_str = self.name + " has "
         for i in range(len(self.cards)):
-            cards_str = cards_str + self.cards[i].__str__() + ", "
+            cards_str = cards_str + str(self.cards[i]) + ", "
         print(cards_str)
 
 
@@ -153,8 +144,7 @@ class Deck(Pile):
                 if self.is_empty():
                     break
                 card = self.pop()
-                hand = players[j].hand
-                hand.add(card)
+                players.add_card_for_player(j, card)
 
 
 class CardGame():

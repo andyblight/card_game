@@ -12,7 +12,7 @@ class TestCard(unittest.TestCase):
     """ Test the card class."""
 
     def test_init_valid(self):
-        valid_values = ((1, 1), (2, 4), (3, 11), (4, 13))
+        valid_values = ((1, 1), (2, 4), (3, 11), (4, 13), (5, 14))
         for suit, rank in valid_values:
             card1 = CardGame.Card(suit, rank)
             self.assertEqual(card1.suit, suit)
@@ -24,18 +24,26 @@ class TestCard(unittest.TestCase):
             dummy = self.assertRaises(ValueError, CardGame.Card, suit, rank)
 
     def test_str(self):
-        valid_values = ((1, 1, "Hearts", "Ace"),
-                        (2, 4, "Diamonds", "Four"),
-                        (3, 10, "Clubs", "Ten"),
-                        (3, 11, "Clubs", "Jack"),
-                        (4, 12, "Spades", "Queen"),
-                        (4, 13, "Spades", "King"))
+        valid_values = ((CardGame.Suit.Hearts,   CardGame.Rank.Ace,
+                         "Hearts", "Ace"),
+                        (CardGame.Suit.Diamonds, CardGame.Rank.Four,
+                         "Diamonds", "Four"),
+                        (CardGame.Suit.Clubs, CardGame.Rank.Ten,
+                         "Clubs", "Ten"),
+                        (CardGame.Suit.Clubs, CardGame.Rank.Jack,
+                         "Clubs", "Jack"),
+                        (CardGame.Suit.Spades, CardGame.Rank.Queen,
+                         "Spades", "Queen"),
+                        (CardGame.Suit.Spades, CardGame.Rank.King,
+                         "Spades", "King"),
+                        (CardGame.Suit.Red, CardGame.Rank.Joker,
+                         "Red", "Joker"),
+                        (CardGame.Suit.Black, CardGame.Rank.Joker,
+                         "Black", "Joker"))
         for suit, rank, suit_name, rank_name in valid_values:
-            suit_split = suit_name.partition(".")
-            rank_spilt = rank_name.partition(".")
-            card_string = rank_spilt[2] + " of " + suit_split[2]
-            card1 = CardGame.Card(suit, rank)
-            self.assertEqual(card_string, card1.__str__())
+            card_str = rank_name + " " + suit_name
+            card = CardGame.Card(suit, rank)
+            self.assertEqual(card_str, card.__str__())
 
 
 class TestPile(unittest.TestCase):
@@ -90,14 +98,6 @@ class TestPile(unittest.TestCase):
         pile.add(CardGame.Card(4, 9))
         self.assertFalse(pile.is_empty())
         self.assertEqual(pile.count(), 4)
-        # Delete one card from the middle of the pile.
-        self.assertTrue(pile.remove(CardGame.Card(3, 9)))
-        self.assertFalse(pile.is_empty())
-        self.assertEqual(pile.count(), 3)
-        # Try to delete one card not in the pile.
-        self.assertFalse(pile.remove(CardGame.Card(3, 10)))
-        self.assertFalse(pile.is_empty())
-        self.assertEqual(pile.count(), 3)
 
 
 if __name__ == "__main__":
