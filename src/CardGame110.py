@@ -69,7 +69,7 @@ class CardGame110():
         """The bidding phase of the game.
         Starting with the player to the left of the dealer, each player bids
         for the right to chose the trump suit.  The bids must be either no
-        bid or a minimum of 15 points and a maximum of 30 points.  The dealer 
+        bid or a minimum of 15 points and a maximum of 30 points.  The dealer
         has the bonus of winning the bid with a bid equal to the current
         highest bid.
         The bidding is complete when either a bid of 30 is called or refused
@@ -80,7 +80,7 @@ class CardGame110():
         winning_bid = 10
         winning_bid_player = -1
         starting_player_num = self.players.get_player_num_left_of_dealer()
-        player_num = self.players.start_round(starting_player_num, True)
+        player_num = self.players.start_round(starting_player_num, False)
         while player_num is not -1:
             if player_num is winning_bid_player:
                 # Gone round with no takers so bidding over

@@ -100,6 +100,31 @@ class TestPile(unittest.TestCase):
         self.assertEqual(pile.count(), 4)
 
 
+class TestPlayers(unittest.TestCase):
+    """."""
+
+    def test_rounds(self):
+        """."""
+        players = CardGame.Players
+        player = CardGame.Player("Andy")
+        player.is_dealer = True
+        players.append(player)
+        player = CardGame.Player("Brian")
+        players.append(player)
+        player = CardGame.Player("Colin")
+        players.append(player)
+        player = CardGame.Player("David")
+        players.append(player)
+        # Iterate over players one shot, clockwise
+        expected_player_list = (1, 2, 3, 0)
+        player_list = list()
+        starting_player_num = players.get_player_num_left_of_dealer()
+        player_num = players.start_round(starting_player_num, False)
+        while player_num is not -1:
+            player_list.append(player_num)
+            player_num = players.get_next_player_num_for_round()
+        self.assertEqual(player_list, expected_player_list)
+
 if __name__ == "__main__":
     # import sys;sys.argv = ['', 'Test.testName']
     unittest.main()

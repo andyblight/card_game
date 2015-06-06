@@ -126,8 +126,9 @@ class Players():
 
     def __init__(self):
         self.players = list()
+        self.round_start_player = -1
         self.round_next_player = -1
-        self.round_continuous = False
+        self.round_one_shot = True
         self.round_clockwise = True
         self.dealer_num = -1
 
@@ -141,8 +142,9 @@ class Players():
     def clear(self):
         """Clears the list of players."""
         self.players.clear()
+        self.round_start_player = -1
         self.round_next_player = -1
-        self.round_continuous = False
+        self.round_one_shot = True
         self.round_clockwise = True
         self.dealer_num = -1
 
@@ -187,29 +189,36 @@ class Players():
         player_num %= len(self.players)
         return player_num
 
-    def start_round(self, start_player_num, continuous=False, clockwise=True):
+    def start_round(self, start_player_num, one_shot=True, clockwise=True):
         """Sets the starting player number and the type of round.
         Returns the value of start_player_num if in range, otherwise -1."""
         if 0 <= start_player_num <= len(self.players):
+            self.round_start_player = start_player_num
             self.round_next_player = start_player_num
         else:
+            self.round_start_player = -1
             self.round_next_player = -1
-        self.round_continuous = continuous
+        self.one_shot = one_shot
         self.round_clockwise = clockwise
+        print("Start round: player", self.round_next_player,
+              "one_shot", self.one_shot,
+              "clockwise", self.round_clockwise)
         return self.round_next_player
 
     def get_next_player_num_for_round(self):
-        """Gets the next player number for the round stopping when dealer has
-        completed their turn.  Returns -1 if the round has finished."""
-        if not self.round_continuous and \
-                self.players[self.round_next_player].is_dealer:
-            self.round_next_player = -1
+        """Gets the next player number for the round.  If not continuous,
+        stopping when dealer has completed their turn.
+        Returns -1 if the round has finished."""
+        if self.round_clockwise:
+            self.round_next_player += 1
         else:
-            if self.round_clockwise:
-                self.round_next_player += 1
-            else:
-                self.round_next_player -= 1
-            self.round_next_player %= len(self.players)
+            self.round_next_player -= 1
+        self.round_next_player %= len(self.players)
+        if self.one_shot and self.round_start_player == self.round_next_player:
+            self.round_next_player = -1
+        print("Get next round: player", self.round_next_player,
+              "one_shot", self.one_shot,
+              "clockwise", self.round_clockwise)
         return self.round_next_player
 
 
