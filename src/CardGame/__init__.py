@@ -59,6 +59,22 @@ class Card:
         # print("DBG Card " + card_str + ".")
         return card_str
 
+    def value(self):
+        """Returns the value of the card."""
+        return int(self.rank)
+
+    def is_black(self):
+        """ Returns True is the suit is black."""
+        return self.suit == Suit.Clubs or \
+            self.suit == Suit.Spades or \
+            self.suit == Suit.Black
+
+    def is_red(self):
+        """ Returns True is the suit is red."""
+        return self.suit == Suit.Hearts or \
+            self.suit == Suit.Diamonds or \
+            self.suit == Suit.Red
+
 
 class Pile:
     """The pile class holds number of cards in a stack."""

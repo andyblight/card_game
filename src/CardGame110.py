@@ -9,6 +9,55 @@ Created on 19 May 2015
 import CardGame
 
 
+class Card110(CardGame.Card):
+    """The 110 version of a card overriding the value method """
+
+    def value(self, trump_suit):
+        """Returns the value of the card. The value rules for 110 are:
+        5 Hearts
+        Jack of trumps
+        Joker
+        Trump suit in order
+        All other suits in order
+        The order of the suits is different for Red and Black suits.
+        Red is 'normal', Ace, King, Queen, Jack, 10 to 2.
+        Black is 'lowest in black', Ace, King, Queen, Jack, 2 to 10.
+        The value is only used for comparison.
+        Non trump Black and Red cards have the same values.
+        Trump values are always greater than the cards of non-trump suit."""
+        value = int(0)
+        if self.rank == CardGame.Rank.Five and \
+                self.suit == CardGame.Suit.Hearts:
+            value = 50
+        elif self.rank == CardGame.Rank.Jack and self.suit == trump_suit:
+            value = 48
+        elif self.rank == CardGame.Rank.Joker:
+            value = 46
+        elif self.suit == trump_suit:
+            value = self.value_black_and_red() + 20
+        else:
+            value = self.value_black_and_red()
+        return value
+
+    def value_black_and_red(self):
+        """Value the card for the black and red suits.
+        Only to be called from value."""
+        value = int(0)
+        if self.is_red():
+            if CardGame.Rank.Ace == self.rank:
+                value = 14
+            else:
+                value = int(self.rank)
+        else:
+            if CardGame.Rank.Ace == self.rank:
+                value = 14
+            else:
+                value = int(self.rank)
+                if value <= 10:
+                    value = 11 - value
+        return value
+
+
 class Player110(CardGame.Player):
     """The player is a normal player with a current score."""
 
@@ -22,13 +71,18 @@ class Player110(CardGame.Player):
         self.clear()
 
 
-class Deck110(CardGame.Deck52Card):
+class Deck110(CardGame.Deck):
     """The deck for 110 is a normal deck with one joker."""
 
     def __init__(self):
-        CardGame.Deck52Card.__init__(self)
-        self.cards.append(CardGame.Card(CardGame.Suit.Red,
-                                        CardGame.Rank.Joker))
+        CardGame.Deck.__init__(self)
+        for suit in CardGame.Suit:
+            for rank in CardGame.Rank:
+                if (CardGame.Suit.Hearts < suit < CardGame.Suit.Red) \
+                        and (CardGame.Rank.Ace < rank < CardGame.Rank.Joker):
+                    self.cards.append(Card110(suit, rank))
+        self.cards.append(Card110(CardGame.Suit.Red,
+                                  CardGame.Rank.Joker))
 
 
 class CardGame110():
@@ -113,6 +167,11 @@ class CardGame110():
             winning_bid_player = -1
         return winning_bid_player
 
+    def set_trump_suit(self, winning_bid_player):
+        """The player who wins the bid selects the trump suit."""
+        trump_card = self.mark_card_to_play(winning_bid_player)
+        return trump_card.suit
+
     def mark_cards_for_discard(self, player):
         """Mark the cards in the players hand that will be discarded."""
         cards_to_discard = [False, False, False, False, False]
@@ -126,15 +185,15 @@ class CardGame110():
                       format(str(card_index + 1),
                              str(cards_to_discard[card_index]),
                              str(player.hand.cards[card_index])))
-            bid_string = input(
+            discard_string = input(
                 "Enter card to discard, 1-5. Enter 0 when done.")
             try:
-                bid_value = int(bid_string)
+                discard_value = int(discard_string)
             except ValueError:
-                bid_value = -1
-            if 0 < bid_value < 6:
-                cards_to_discard[bid_value - 1] = True
-            if bid_value == 0:
+                discard_value = -1
+            if 0 < discard_value < 6:
+                cards_to_discard[discard_value - 1] = True
+            if discard_value == 0:
                 discarding = False
         return cards_to_discard
 
@@ -153,15 +212,67 @@ class CardGame110():
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
 
-    def play_hand(self, starting_player_num):
-        """ ."""
-        print("play hand")
+    def mark_card_to_play(self, player):
+        """Select the card in the players hand to be played."""
+        # Display cards with those marked for discard
+        print("Player " + player.hand.name)
+        print("Index  Card")
+        card_index = 0
+        for card_index in range(0, len(player.hand.cards)):
+            print("{:5}  {}".
+                  format(str(card_index + 1),
+                         str(player.hand.cards[card_index])))
+        play_string = input("Enter card to play, 1-5.")
+        try:
+            play_value = int(play_string)
+        except ValueError:
+            play_value = -1
+        if 0 < play_value < 6:
+            card_to_play = player.hand.cards[card_index]
+        return card_to_play
+
+    def play_trick(self, starting_player_num):
+        """Play one card from each player in turn.  Determines the winning 
+        player and the value of the winning trick."""
+        print("Play round")
+        winning_score = -1
+        winning_player_num = -1
         player_num = self.players.start_round(starting_player_num)
         while player_num is not -1:
             player = self.players.get_player(player_num)
-            # Debug
-            player.hand.list()
+            card_to_play = self.mark_card_to_play(player)
+            value = card_to_play.value()
+            if winning_score < value:
+                winning_score = value
+                winning_player_num = player_num
             player_num = self.players.get_next_player_num_for_round()
+        return (winning_score, winning_player_num)
+
+    def play_hand(self, starting_player_num):
+        """Play all cards in hand by playing one round at a time.
+        Each trick scores the winner 5 points.  The player that has the 
+        highest value trick at the end of the hand gets a 5 point bonus."""
+        print("Play hand")
+        highest_score = -1
+        highest_scoring_player_num = -1
+        player_num = self.players.start_round(starting_player_num)
+        while player_num is not -1:
+            winning_score, winning_player_num = \
+                self.play_trick(starting_player_num)
+            if highest_score < winning_score:
+                highest_score = winning_score
+                highest_scoring_player_num = winning_player_num
+            # Update the scores for the trick.
+            winning_player = self.players.get_player(winning_player_num)
+            winning_player.current_score += 5
+            self.players.get_player(winning_player_num, winning_player)
+            player_num = self.players.get_next_player_num_for_round()
+        # Score the 5 point bonus
+        highest_scoring_player = \
+            self.players.get_player(highest_scoring_player_num)
+        highest_scoring_player.current_score += 5
+        self.players.get_player(highest_scoring_player_num,
+                                highest_scoring_player)
 
     def update_scores(self, starting_player_num):
         """ ."""
@@ -199,13 +310,17 @@ class CardGame110():
             self.reset_scores()
             winning_player_num = -1
             while winning_player_num == -1:
+                self.deck.shuffle()
                 self.deal_hands()
                 starting_player_num = self.bid()
-                if starting_player_num is not -1:
+                self.set_trump_suit(starting_player_num)
+                player_num = self.players.start_round(starting_player_num)
+                while player_num is not -1:
                     self.exchange_cards(starting_player_num)
                     self.play_hand(starting_player_num)
                     winning_player_num = self.update_scores(
                         starting_player_num)
+                    player_num = self.players.get_next_player_num_for_round()
             input_string = input('Enter y to play again...')
             if input_string != "y":
                 play_again = False
