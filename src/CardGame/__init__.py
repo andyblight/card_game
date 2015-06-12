@@ -214,10 +214,10 @@ class Players():
         else:
             self.round_start_player = -1
             self.round_next_player = -1
-        self.one_shot = one_shot
+        self.round_one_shot = one_shot
         self.round_clockwise = clockwise
         print("Start round: player", self.round_next_player,
-              "one_shot", self.one_shot,
+              "one_shot", self.round_one_shot,
               "clockwise", self.round_clockwise)
         return self.round_next_player
 
@@ -230,10 +230,10 @@ class Players():
         else:
             self.round_next_player -= 1
         self.round_next_player %= len(self.players)
-        if self.one_shot and self.round_start_player == self.round_next_player:
+        if self.round_one_shot and self.round_start_player == self.round_next_player:
             self.round_next_player = -1
         print("Get next round: player", self.round_next_player,
-              "one_shot", self.one_shot,
+              "one_shot", self.round_one_shot,
               "clockwise", self.round_clockwise)
         return self.round_next_player
 

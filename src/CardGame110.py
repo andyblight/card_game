@@ -92,6 +92,7 @@ class CardGame110():
         self.deck = Deck110()
         self.highest_score = 0
         self.players = CardGame.Players()
+        self.trump_suit = CardGame.Suit.Undefined
 
     def add_players(self):
         """For now, this is a bodge so just add four players."""
@@ -167,10 +168,13 @@ class CardGame110():
             winning_bid_player = -1
         return winning_bid_player
 
-    def set_trump_suit(self, winning_bid_player):
+    def set_trump_suit(self, winning_bid_player_num):
         """The player who wins the bid selects the trump suit."""
-        trump_card = self.mark_card_to_play(winning_bid_player)
-        return trump_card.suit
+        player = self.players.get_player(winning_bid_player_num)
+        trump_card = self.select_card_from_hand(
+            player, "Select card for trump suit, 1-5 ")
+        print(player.hand.name, "selected", str(trump_card.suit))
+        self.trump_suit = trump_card.suit
 
     def mark_cards_for_discard(self, player):
         """Mark the cards in the players hand that will be discarded."""
@@ -212,7 +216,7 @@ class CardGame110():
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
 
-    def mark_card_to_play(self, player):
+    def select_card_from_hand(self, player, text_to_show):
         """Select the card in the players hand to be played."""
         # Display cards with those marked for discard
         print("Player " + player.hand.name)
@@ -222,7 +226,7 @@ class CardGame110():
             print("{:5}  {}".
                   format(str(card_index + 1),
                          str(player.hand.cards[card_index])))
-        play_string = input("Enter card to play, 1-5.")
+        play_string = input(text_to_show)
         try:
             play_value = int(play_string)
         except ValueError:
@@ -232,7 +236,7 @@ class CardGame110():
         return card_to_play
 
     def play_trick(self, starting_player_num):
-        """Play one card from each player in turn.  Determines the winning 
+        """Play one card from each player in turn.  Determines the winning
         player and the value of the winning trick."""
         print("Play round")
         winning_score = -1
@@ -240,8 +244,9 @@ class CardGame110():
         player_num = self.players.start_round(starting_player_num)
         while player_num is not -1:
             player = self.players.get_player(player_num)
-            card_to_play = self.mark_card_to_play(player)
-            value = card_to_play.value()
+            card_to_play = self.select_card_from_hand(
+                player, "Select card to play, 1-5 ")
+            value = card_to_play.value(self.trump_suit)
             if winning_score < value:
                 winning_score = value
                 winning_player_num = player_num
@@ -250,7 +255,7 @@ class CardGame110():
 
     def play_hand(self, starting_player_num):
         """Play all cards in hand by playing one round at a time.
-        Each trick scores the winner 5 points.  The player that has the 
+        Each trick scores the winner 5 points.  The player that has the
         highest value trick at the end of the hand gets a 5 point bonus."""
         print("Play hand")
         highest_score = -1
@@ -265,13 +270,13 @@ class CardGame110():
             # Update the scores for the trick.
             winning_player = self.players.get_player(winning_player_num)
             winning_player.current_score += 5
-            self.players.get_player(winning_player_num, winning_player)
+            self.players.set_player(winning_player_num, winning_player)
             player_num = self.players.get_next_player_num_for_round()
         # Score the 5 point bonus
         highest_scoring_player = \
             self.players.get_player(highest_scoring_player_num)
         highest_scoring_player.current_score += 5
-        self.players.get_player(highest_scoring_player_num,
+        self.players.set_player(highest_scoring_player_num,
                                 highest_scoring_player)
 
     def update_scores(self, starting_player_num):
