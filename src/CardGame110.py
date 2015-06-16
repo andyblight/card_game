@@ -10,9 +10,9 @@ import CardGame
 
 
 class Card110(CardGame.Card):
-    """The 110 version of a card overriding the value method """
+    """The 110 version of a card with a different value method """
 
-    def value(self, trump_suit):
+    def value110(self, trump_suit):
         """Returns the value of the card. The value rules for 110 are:
         5 Hearts
         Jack of trumps
@@ -176,7 +176,8 @@ class CardGame110():
         print(player.hand.name, "selected", str(trump_card.suit))
         self.trump_suit = trump_card.suit
 
-    def mark_cards_for_discard(self, player):
+    @classmethod
+    def mark_cards_for_discard(cls, player):
         """Mark the cards in the players hand that will be discarded."""
         cards_to_discard = [False, False, False, False, False]
         discarding = True
@@ -216,7 +217,8 @@ class CardGame110():
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
 
-    def select_card_from_hand(self, player, text_to_show):
+    @classmethod
+    def select_card_from_hand(cls, player, text_to_show):
         """Select the card in the players hand to be played."""
         # Display cards with those marked for discard
         print("Player " + player.hand.name)
@@ -246,7 +248,7 @@ class CardGame110():
             player = self.players.get_player(player_num)
             card_to_play = self.select_card_from_hand(
                 player, "Select card to play, 1-5 ")
-            value = card_to_play.value(self.trump_suit)
+            value = card_to_play.value110(self.trump_suit)
             if winning_score < value:
                 winning_score = value
                 winning_player_num = player_num

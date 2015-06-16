@@ -230,7 +230,8 @@ class Players():
         else:
             self.round_next_player -= 1
         self.round_next_player %= len(self.players)
-        if self.round_one_shot and self.round_start_player == self.round_next_player:
+        if self.round_one_shot and \
+                self.round_start_player == self.round_next_player:
             self.round_next_player = -1
         print("Get next round: player", self.round_next_player,
               "one_shot", self.round_one_shot,
