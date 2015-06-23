@@ -12,7 +12,7 @@ import CardGame
 class Card110(CardGame.Card):
     """The 110 version of a card with a different value method """
 
-    def value110(self, trump_suit):
+    def value(self, trump_suit):
         """Returns the value of the card. The value rules for 110 are:
         5 Hearts
         Jack of trumps
@@ -171,19 +171,22 @@ class CardGame110():
     def set_trump_suit(self, winning_bid_player_num):
         """The player who wins the bid selects the trump suit."""
         player = self.players.get_player(winning_bid_player_num)
-        trump_card = self.select_card_from_hand(
-            player, "Select card for trump suit, 1-5 ")
-        print(player.hand.name, "selected", str(trump_card.suit))
+        valid_card = False
+        while not valid_card:
+            trump_card = self.select_card_from_hand(
+                player, "Select card for trump suit, 1-5 ")
+            if trump_card.suit == CardGame.Suit.Undefined:
+                valid_card = True
+            print(player.hand.name, "selected", trump_card.suit)
         self.trump_suit = trump_card.suit
 
-    @classmethod
-    def mark_cards_for_discard(cls, player):
+    def mark_cards_for_discard(self, player):
         """Mark the cards in the players hand that will be discarded."""
         cards_to_discard = [False, False, False, False, False]
         discarding = True
         while discarding:
             # Display cards with those marked for discard
-            print("Player " + player.hand.name)
+            print("Player", player.hand.name, "Trump suit", self.trump_suit)
             print("Index  Discard  Card")
             for card_index in range(0, len(player.hand.cards)):
                 print("{:5}  {:7}  {}".
@@ -197,7 +200,8 @@ class CardGame110():
             except ValueError:
                 discard_value = -1
             if 0 < discard_value < 6:
-                cards_to_discard[discard_value - 1] = True
+                cards_to_discard[discard_value - 1] = \
+                    not cards_to_discard[discard_value - 1]
             if discard_value == 0:
                 discarding = False
         return cards_to_discard
@@ -213,17 +217,19 @@ class CardGame110():
             for card_index in range(0, len(player.hand.cards)):
                 if cards_to_discard[card_index]:
                     player.hand.cards[card_index] = self.deck.pop()
+            print("Exchanged ", len(cards_to_discard), "cards")
             # Update the player's cards
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
 
-    @classmethod
-    def select_card_from_hand(cls, player, text_to_show):
+    def select_card_from_hand(self, player, text_to_show):
         """Select the card in the players hand to be played."""
         # Display cards with those marked for discard
-        print("Player " + player.hand.name)
+        print("Player " + player.hand.name, "Trump suit", self.trump_suit)
         print("Index  Card")
         card_index = 0
+        selected_card = CardGame.Card()
+        selected_card.rank = CardGame.Rank.Undefined
         for card_index in range(0, len(player.hand.cards)):
             print("{:5}  {}".
                   format(str(card_index + 1),
@@ -233,9 +239,10 @@ class CardGame110():
             play_value = int(play_string)
         except ValueError:
             play_value = -1
-        if 0 < play_value < 6:
-            card_to_play = player.hand.cards[card_index]
-        return card_to_play
+        # print("Selected value ", play_value)
+        if 0 < play_value < len(player.hand.cards):
+            selected_card = player.hand.cards[play_value - 1]
+        return selected_card
 
     def play_trick(self, starting_player_num):
         """Play one card from each player in turn.  Determines the winning
@@ -243,12 +250,29 @@ class CardGame110():
         print("Play round")
         winning_score = -1
         winning_player_num = -1
+        suit_to_follow = CardGame.Suit.Undefined
+        first_player = False
+        invalid_card_played = True
         player_num = self.players.start_round(starting_player_num)
         while player_num is not -1:
             player = self.players.get_player(player_num)
-            card_to_play = self.select_card_from_hand(
-                player, "Select card to play, 1-5 ")
-            value = card_to_play.value110(self.trump_suit)
+            while invalid_card_played:
+                card_to_play = self.select_card_from_hand(
+                    player, "Select card to play, 1-5 ")
+                print(player.hand.name, " played the ", card_to_play)
+                # Check to make sure the player has followed suit correctly.
+                invalid_card_played = False
+                if not first_player:
+                    first_player = True
+                    suit_to_follow = card_to_play.suit
+                else:
+                    if suit_to_follow != card_to_play.suit:
+                        for card_index in range(0, len(player.hand.cards)):
+                            if player.hand.cards[card_index].suit == \
+                                    suit_to_follow:
+                                invalid_card_played = True
+                                print("You must follow suit!!!!")
+            value = card_to_play.value(self.trump_suit)
             if winning_score < value:
                 winning_score = value
                 winning_player_num = player_num
@@ -310,7 +334,7 @@ class CardGame110():
         return winning_player
 
     def play(self):
-        """play a round."""
+        """Play a round."""
         play_again = True
         while play_again:
             # Zero current scores

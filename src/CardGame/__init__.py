@@ -17,6 +17,11 @@ class Suit(IntEnum):
     Red = 5
     Black = 6
 
+    def __str__(self):
+        suit_string = IntEnum.__str__(self)
+        suit_split = suit_string.partition(".")
+        return suit_split[2]
+
 
 class Rank(IntEnum):
     """ Ranks of the Card. """
@@ -36,6 +41,11 @@ class Rank(IntEnum):
     King = 13
     Joker = 14
 
+    def __str__(self):
+        rank_string = IntEnum.__str__(self)
+        rank_split = rank_string.partition(".")
+        return rank_split[2]
+
 
 class Card:
     """ The Card class implements the basic methods for using a card. """
@@ -51,15 +61,11 @@ class Card:
             raise ValueError("Parameter out of range")
 
     def __str__(self):
-        suit_string = str(self.suit)
-        rank_string = str(self.rank)
-        suit_split = suit_string.partition(".")
-        rank_spilt = rank_string.partition(".")
-        card_str = rank_spilt[2] + " " + suit_split[2]
+        card_str = str(self.rank) + " " + str(self.suit)
         # print("DBG Card " + card_str + ".")
         return card_str
 
-    def value(self):
+    def value(self, trump_suit):  # pylint: disable=unused-argument
         """Returns the value of the card."""
         return int(self.rank)
 
@@ -216,9 +222,9 @@ class Players():
             self.round_next_player = -1
         self.round_one_shot = one_shot
         self.round_clockwise = clockwise
-        print("Start round: player", self.round_next_player,
-              "one_shot", self.round_one_shot,
-              "clockwise", self.round_clockwise)
+        # print("Start round: player", self.round_next_player,
+        #      "one_shot", self.round_one_shot,
+        #      "clockwise", self.round_clockwise)
         return self.round_next_player
 
     def get_next_player_num_for_round(self):
@@ -233,9 +239,9 @@ class Players():
         if self.round_one_shot and \
                 self.round_start_player == self.round_next_player:
             self.round_next_player = -1
-        print("Get next round: player", self.round_next_player,
-              "one_shot", self.round_one_shot,
-              "clockwise", self.round_clockwise)
+        # print("Get next round: player", self.round_next_player,
+        #      "one_shot", self.round_one_shot,
+        #      "clockwise", self.round_clockwise)
         return self.round_next_player
 
 

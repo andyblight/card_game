@@ -3,8 +3,10 @@ Created on 17 May 2015
 
 @author: andy
 """
+# pylint: disable=too-many-public-methods
 
 import unittest
+import sys
 import CardGame
 
 
@@ -12,6 +14,7 @@ class TestCard(unittest.TestCase):
     """ Test the card class."""
 
     def test_init_valid(self):
+        """ ."""
         valid_values = ((1, 1), (2, 4), (3, 11), (4, 13), (5, 14))
         for suit, rank in valid_values:
             card1 = CardGame.Card(suit, rank)
@@ -19,11 +22,13 @@ class TestCard(unittest.TestCase):
             self.assertEqual(card1.rank, rank)
 
     def test_init_invalid(self):
+        """ ."""
         invalid_values = ((0, 0), (7, 1), (3, 15))
         for suit, rank in invalid_values:
             dummy = self.assertRaises(ValueError, CardGame.Card, suit, rank)
 
     def test_str(self):
+        """ ."""
         valid_values = ((CardGame.Suit.Hearts,   CardGame.Rank.Ace,
                          "Hearts", "Ace"),
                         (CardGame.Suit.Diamonds, CardGame.Rank.Four,
@@ -47,8 +52,10 @@ class TestCard(unittest.TestCase):
 
 
 class TestPile(unittest.TestCase):
+    """."""
 
     def test_empty_pile(self):
+        """ ."""
         pile_name = "Test pile"
         pile = CardGame.Pile(pile_name)
         self.assertEqual(pile.name, pile_name)
@@ -56,6 +63,7 @@ class TestPile(unittest.TestCase):
         self.assertEqual(pile.count(), 0)
 
     def test_one_card(self):
+        """ ."""
         pile_name = "Test pile"
         pile = CardGame.Pile(pile_name)
         # Add one card
@@ -80,6 +88,7 @@ class TestPile(unittest.TestCase):
         self.assertEqual(card1.rank, 9)
 
     def test_many_cards(self):
+        """ ."""
         pile_name = "Test pile"
         pile = CardGame.Pile(pile_name)
         # Add one card
@@ -126,5 +135,5 @@ class TestPlayers(unittest.TestCase):
         self.assertEqual(player_list, expected_player_list)
 
 if __name__ == "__main__":
-    # import sys;sys.argv = ['', 'Test.testName']
+    sys.argv = ['', 'Test.testName']
     unittest.main()
