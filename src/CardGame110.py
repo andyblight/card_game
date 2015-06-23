@@ -175,9 +175,9 @@ class CardGame110():
         while not valid_card:
             trump_card = self.select_card_from_hand(
                 player, "Select card for trump suit, 1-5 ")
-            if trump_card.suit == CardGame.Suit.Undefined:
-                valid_card = True
             print(player.hand.name, "selected", trump_card.suit)
+            if trump_card.suit != CardGame.Suit.Undefined:
+                valid_card = True
         self.trump_suit = trump_card.suit
 
     def mark_cards_for_discard(self, player):
@@ -217,7 +217,7 @@ class CardGame110():
             for card_index in range(0, len(player.hand.cards)):
                 if cards_to_discard[card_index]:
                     player.hand.cards[card_index] = self.deck.pop()
-            print("Exchanged ", len(cards_to_discard), "cards")
+            print("Exchanged", len(cards_to_discard), "cards")
             # Update the player's cards
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
@@ -239,7 +239,7 @@ class CardGame110():
             play_value = int(play_string)
         except ValueError:
             play_value = -1
-        # print("Selected value ", play_value)
+        print("Selected value ", play_value)
         if 0 < play_value < len(player.hand.cards):
             selected_card = player.hand.cards[play_value - 1]
         return selected_card
