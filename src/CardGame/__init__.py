@@ -61,7 +61,12 @@ class Card:
             raise ValueError("Parameter out of range")
 
     def __str__(self):
-        card_str = str(self.rank) + " " + str(self.suit)
+        if self.rank == Rank.Joker:
+            # Jokers are said to be colour Joker.
+            card_str = str(self.suit) + " " + str(self.rank)
+        else:
+            # All other cards are rank of suit.
+            card_str = str(self.rank) + " of " + str(self.suit)
         # print("DBG Card " + card_str + ".")
         return card_str
 
@@ -113,6 +118,12 @@ class Pile:
         """Returns and removes the card from the top of the pile."""
         return self.cards.pop(0)
 
+    def remove(self, index):
+        """Returns and remove the card with the given index from the pile."""
+        card = self.cards[index]
+        del self.cards[index]
+        return card
+
 
 class Hand(Pile):
     """class."""
@@ -132,6 +143,7 @@ class Player():
     """The player class has a one hand."""
 
     def __init__(self, name):
+        self.name = name
         self.hand = Hand(name)
         self.is_dealer = False
 

@@ -7,6 +7,7 @@ Created on 19 May 2015
 # Scores
 
 import CardGame
+from CardGame import Pile
 
 
 class Card110(CardGame.Card):
@@ -90,12 +91,17 @@ class CardGame110():
 
     def __init__(self):
         self.deck = Deck110()
+        self.discard_pile = Pile("Discard")
+        self.play_pile = Pile("Play")
         self.highest_score = 0
         self.players = CardGame.Players()
         self.trump_suit = CardGame.Suit.Undefined
+        self.suit_to_follow = CardGame.Suit.Undefined
+        self.first_player = True
 
     def add_players(self):
-        """For now, this is a bodge so just add four players."""
+        """Add the players to the game."""
+        # AJB HACK Add four players.
         self.players.clear()
         player = Player110("Andy")
         player.is_dealer = True
@@ -173,11 +179,18 @@ class CardGame110():
         player = self.players.get_player(winning_bid_player_num)
         valid_card = False
         while not valid_card:
-            trump_card = self.select_card_from_hand(
+            trump_card_index = self.select_card_from_hand(
                 player, "Select card for trump suit, 1-5 ")
-            print(player.hand.name, "selected", trump_card.suit)
-            if trump_card.suit != CardGame.Suit.Undefined:
-                valid_card = True
+            if trump_card_index != -1:
+                trump_card = player.hand.cards[trump_card_index]
+                print(player.hand.name, "selected", trump_card.suit)
+                if trump_card.suit == CardGame.Suit.Red or \
+                        trump_card.suit == CardGame.Suit.Black:
+                    print("You cannot chose the Joker!")
+                elif trump_card.suit == CardGame.Suit.Undefined:
+                    print("Error: suit == undefined")
+                else:
+                    valid_card = True
         self.trump_suit = trump_card.suit
 
     def mark_cards_for_discard(self, player):
@@ -214,16 +227,19 @@ class CardGame110():
             player = self.players.get_player(player_num)
             cards_to_discard = self.mark_cards_for_discard(player)
             # Replace them with new cards from the deck.
+            cards_exchanged = int(0)
             for card_index in range(0, len(player.hand.cards)):
                 if cards_to_discard[card_index]:
-                    player.hand.cards[card_index] = self.deck.pop()
-            print("Exchanged", len(cards_to_discard), "cards")
+                    self.discard_pile.push(player.hand.remove(card_index))
+                    player.hand.push(self.deck.pop())
+                    cards_exchanged += 1
+            print("Exchanged", cards_exchanged, "cards")
             # Update the player's cards
             self.players.set_player(player_num, player)
             player_num = self.players.get_next_player_num_for_round()
 
     def select_card_from_hand(self, player, text_to_show):
-        """Select the card in the players hand to be played."""
+        """Returns the index of the card selected from the players hand."""
         # Display cards with those marked for discard
         print("Player " + player.hand.name, "Trump suit", self.trump_suit)
         print("Index  Card")
@@ -234,70 +250,93 @@ class CardGame110():
             print("{:5}  {}".
                   format(str(card_index + 1),
                          str(player.hand.cards[card_index])))
-        play_string = input(text_to_show)
+        selected_string = input(text_to_show)
         try:
-            play_value = int(play_string)
+            selected_index = int(selected_string) - 1
+            if selected_index < 0 or selected_index >= len(player.hand.cards):
+                selected_index = -1
         except ValueError:
-            play_value = -1
-        print("Selected value ", play_value)
-        if 0 < play_value < len(player.hand.cards):
-            selected_card = player.hand.cards[play_value - 1]
-        return selected_card
+            selected_index = -1
+        print("DBG: index ", selected_index)
+        return selected_index
 
-    def play_trick(self, starting_player_num):
+    def reset_round(self):
+        """Reset the round variables."""
+        self.suit_to_follow = CardGame.Suit.Undefined
+        self.first_player = True
+
+    def validate_played_card(self, played_card_index, hand):
+        """Validate that the card played is a legal move."""
+        valid_card_played = False
+        if played_card_index != -1:
+            played_card = hand.cards[played_card_index]
+            # Check to make sure the player has followed suit correctly.
+            if self.first_player:
+                self.suit_to_follow = played_card.suit
+                self.first_player = False
+                valid_card_played = True
+                print("The suit to follow is", self.suit_to_follow)
+            else:
+                if self.suit_to_follow == played_card.suit:
+                    valid_card_played = True
+                else:
+                    suit_to_follow_in_hand = False
+                    for card_index in range(0, len(hand.cards)):
+                        if hand.cards[card_index] != \
+                                hand.cards[played_card_index]:
+                            if hand.cards[card_index].suit == \
+                                    self.suit_to_follow:
+                                print("You must play a", self.suit_to_follow)
+                                suit_to_follow_in_hand = True
+                                break
+                    if not suit_to_follow_in_hand:
+                        valid_card_played = True
+        return valid_card_played
+
+    def play_round(self, starting_player_num):
         """Play one card from each player in turn.  Determines the winning
-        player and the value of the winning trick."""
+        player and the value of the winning card."""
         print("Play round")
         winning_score = -1
         winning_player_num = -1
-        suit_to_follow = CardGame.Suit.Undefined
-        first_player = False
-        invalid_card_played = True
+        self.reset_round()
         player_num = self.players.start_round(starting_player_num)
         while player_num is not -1:
             player = self.players.get_player(player_num)
-            while invalid_card_played:
-                card_to_play = self.select_card_from_hand(
+            valid_card_played = False
+            while not valid_card_played:
+                played_card_index = self.select_card_from_hand(
                     player, "Select card to play, 1-5 ")
-                print(player.hand.name, " played the ", card_to_play)
-                # Check to make sure the player has followed suit correctly.
-                invalid_card_played = False
-                if not first_player:
-                    first_player = True
-                    suit_to_follow = card_to_play.suit
-                else:
-                    if suit_to_follow != card_to_play.suit:
-                        for card_index in range(0, len(player.hand.cards)):
-                            if player.hand.cards[card_index].suit == \
-                                    suit_to_follow:
-                                invalid_card_played = True
-                                print("You must follow suit!!!!")
-            value = card_to_play.value(self.trump_suit)
+                valid_card_played = self.validate_played_card(
+                    played_card_index, player.hand)
+            played_card = player.hand.remove(played_card_index)
+            print(player.hand.name, "played the", played_card)
+            value = played_card.value(self.trump_suit)
             if winning_score < value:
                 winning_score = value
                 winning_player_num = player_num
+            self.play_pile.push(played_card)
             player_num = self.players.get_next_player_num_for_round()
         return (winning_score, winning_player_num)
 
     def play_hand(self, starting_player_num):
-        """Play all cards in hand by playing one round at a time.
+        """Play the five cards in each hand by playing one round at a time.
         Each trick scores the winner 5 points.  The player that has the
         highest value trick at the end of the hand gets a 5 point bonus."""
         print("Play hand")
         highest_score = -1
         highest_scoring_player_num = -1
-        player_num = self.players.start_round(starting_player_num)
-        while player_num is not -1:
+        for dummy in range(0, 5):
             winning_score, winning_player_num = \
-                self.play_trick(starting_player_num)
-            if highest_score < winning_score:
-                highest_score = winning_score
-                highest_scoring_player_num = winning_player_num
+                self.play_round(starting_player_num)
             # Update the scores for the trick.
             winning_player = self.players.get_player(winning_player_num)
             winning_player.current_score += 5
             self.players.set_player(winning_player_num, winning_player)
-            player_num = self.players.get_next_player_num_for_round()
+            print("Player", winning_player.name, "won the round.")
+            if highest_score < winning_score:
+                highest_score = winning_score
+                highest_scoring_player_num = winning_player_num
         # Score the 5 point bonus
         highest_scoring_player = \
             self.players.get_player(highest_scoring_player_num)
