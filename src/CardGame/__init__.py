@@ -51,7 +51,7 @@ class Card:
     """ The Card class implements the basic methods for using a card. """
 
     def __init__(self, suit=Suit.Undefined, rank=Rank.Undefined):
-        if (Suit.Undefined < suit <= Suit.Black) \
+        if (Suit.Undefined <= suit <= Suit.Black) \
                 and (Rank.Undefined <= rank <= Rank.Joker):
             self.suit = suit
             self.rank = rank
