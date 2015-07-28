@@ -4,3 +4,15 @@
 TODO
 ====
 Add more rules about bidding.
+
+If a player leads with the Joker, there is no suit set so any card can be laid.
+This works already as no one else will be able to follow suit. 
+
+Add "The suit to follow is" message to each player.
+
+The winner of the round should lead the next round. 
+Next round does not start properly.
+Exchange cards
+Player Colin Trump suit Diamonds
+Index  Discard  Card
+Enter card to discard, 1-5. Enter 0 when done.

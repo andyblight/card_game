@@ -363,7 +363,7 @@ class CardGame110():
                     str(player.current_score))
                 break
             else:
-                print(player.hand.name + " has a score" +
+                print(player.hand.name + " scored " +
                       str(player.current_score))
             player_num = self.players.get_next_player_num_for_round()
         return winning_player
