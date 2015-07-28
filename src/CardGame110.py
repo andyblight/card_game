@@ -347,10 +347,6 @@ class CardGame110():
     def update_scores(self, starting_player_num):
         """ ."""
         print("Updating scores")
-        # AJB Bodge
-        player = self.players.get_player(0)
-        player.current_score = 120
-        self.players.set_player(0, player)
         # Update self.highest_score from players individual scores
         self.highest_score = 0
         winning_player = -1
