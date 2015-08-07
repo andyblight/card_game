@@ -4,8 +4,6 @@ Created on 19 May 2015
 @author: andy
 '''
 
-# Scores
-
 import CardGame
 from CardGame import Pile
 
