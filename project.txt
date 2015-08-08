@@ -1,6 +1,17 @@
 110
 ===
 
+PLAN
+====
+1. Develop the game from the command line.
+2. Create minimal client command line app to send JSON commands 
+   to the server and receive and display the replies. 
+3. Choose a GUI to use. 
+   Pyjs was looking promising until I tried to use it.  Only supports Python2 so no use.
+   Going for PySide instead as it is a Qt wrapper, supports Python3 and is easy to install.   
+4. Create a GUI using the new framework.  
+
+
 TODO
 ====
 Add more rules about bidding.
