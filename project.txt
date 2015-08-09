@@ -1,6 +1,13 @@
 110
 ===
 
+Objectives
+==========
+1. Develop playable application for card games. 110 to start with.
+2. Learn to use Python3.
+3. Don't get involved in fixing other people's code (too much).
+
+
 PLAN
 ====
 1. Develop the game from the command line.
