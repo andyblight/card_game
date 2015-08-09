@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 ############################################################################
 #
@@ -92,11 +92,11 @@ class MainWindow(QtGui.QMainWindow):
 
     def createActions(self):
         self.selectGameAct = QtGui.QAction("&Select...", self,
-                shortcut=QtGui.QKeySequence.New,
+                shortcut=QtGui.QKeySequence.Save,
                 statusTip="Select a game", triggered=self.selectGame)
 
         self.restartGameAct = QtGui.QAction("&Restart...", self,
-                shortcut=QtGui.QKeySequence.Open,
+                shortcut=QtGui.QKeySequence.Replace,
                 statusTip="Restart the current game", triggered=self.restartGame)
 
         self.exitAct = QtGui.QAction("E&xit", self, shortcut="Ctrl+Q",
