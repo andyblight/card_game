@@ -97,20 +97,6 @@ class CardGame110():
         self.suit_to_follow = CardGame.Suit.Undefined
         self.first_player = True
 
-    def add_players(self):
-        """Add the players to the game."""
-        # AJB HACK Add four players.
-        self.players.clear()
-        player = Player110("Andy")
-        player.is_dealer = True
-        self.players.append(player)
-        player = Player110("Brian")
-        self.players.append(player)
-        player = Player110("Colin")
-        self.players.append(player)
-        player = Player110("David")
-        self.players.append(player)
-
     def reset_scores(self):
         """ ."""
         print("Resetting scores and player's hands")
@@ -392,5 +378,15 @@ class CardGame110():
 
 if __name__ == '__main__':
     GAME = CardGame110()
-    GAME.add_players()
+    # AJB HACK Add four players.
+    GAME.players.clear()
+    player = Player110("Andy")
+    player.is_dealer = True
+    GAME.players.append(player)
+    player = Player110("Brian")
+    GAME.players.append(player)
+    player = Player110("Colin")
+    GAME.players.append(player)
+    player = Player110("David")
+    GAME.players.append(player)
     GAME.play()
