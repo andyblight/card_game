@@ -19,6 +19,30 @@ PLAN
 4. Create a GUI using the new framework.  
 
 
+IPC
+===
+Use twisted framework to create server.
+	Four telnet clients to start with.
+	When GUI starts working, change to JSON.
+Twisted was no good as the Python3 version was rubbish.  Looks like Twisted is dead.
+
+Found Tornado.  This works for Python3 but takes a lot of getting my head round it and it 
+looks like I'm going to end up with a nice web front end. Not quite what I was looking for. 
+
+Trying again.
+
+GUI
+===
+Implement basic menus.
+>> Done.
+Set up communication with the server using temporary menu commands for input.
+Basic drag and drop of pixmaps.
+Find some nice pixmaps for the deck.
+Work out how to do the layout in the GUI.  The piles on the server 
+don't know where they are but the piles in the GUI need to know.  Need some 
+sort of layout file?
+
+
 TODO
 ====
 Add more rules about bidding.
