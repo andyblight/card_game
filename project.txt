@@ -31,6 +31,10 @@ looks like I'm going to end up with a nice web front end. Not quite what I was l
 
 Trying again.
 
+Finally found a very basic server for telnet clients. See src/test_apps/async_test for code.
+Carried on looking.  Found and modified some example code to create a nice TCP example.
+Now to make it multi-client. 
+
 GUI
 ===
 Implement basic menus.

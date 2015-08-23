@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+# TODO Derived  from a a GPL2 example so sort out copyright.
+
 ############################################################################
 #
 #  Copyright (C) 2004-2005 Trolltech AS. All rights reserved.
